@@ -263,7 +263,7 @@ export default function Conversations() {
       .channel("conversations-realtime")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "conversations" },
+        { event: "INSERT", schema: "capsulehouse_customization", table: "conversations" },
         (payload) => {
           const newMsg = payload.new as Message;
 
