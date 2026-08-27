@@ -265,7 +265,7 @@ Include this JSON block at the END of your confirmation message.
 
 CRITICAL ORDER INSTRUCTION:
 When you have collected ALL required order details and the customer confirms, you MUST include a JSON block in your response wrapped in <ORDER_JSON> tags like this:
-- For PHYSICAL products: <ORDER_JSON>{"customer_name":"...","customer_phone":"...","district":"...","customer_address":"...","order_items":[{"name":"...","price":...,"quantity":...,"product_type":"physical"}],"payment_method":"cod or bank_transfer","total_amount":...}</ORDER_JSON>
+- For PHYSICAL products: <ORDER_JSON>{"customer_name":"...","customer_phone":"...","district":"...","customer_address":"...","order_items":[{"name":"...","price":...,"quantity":...,"product_type":"physical"}],"payment_method":"cod","total_amount":...}</ORDER_JSON> (Note: payment_method MUST be exactly "cod" or "bank_transfer")
 - For DIGITAL products: <ORDER_JSON>{"customer_name":"...","customer_phone":"...","customer_email":"...","customer_address":null,"order_items":[{"name":"...","price":...,"quantity":...,"product_type":"digital"}],"payment_method":"bank_transfer","total_amount":...}</ORDER_JSON>
 Include this JSON block at the END of your confirmation message. The customer won't see the JSON tags.
 
@@ -504,6 +504,7 @@ CRITICAL SECURITY RULE:
           .from("customers")
           .select("id")
           .eq("contact_number", customerData.contact_number)
+          .eq("user_id", userId)
           .limit(1);
 
         if (existingCustomers && existingCustomers.length > 0) {
@@ -526,6 +527,7 @@ CRITICAL SECURITY RULE:
               contact_number: customerData.contact_number,
               location: customerData.location,
               start_time: customerData.start_time,
+              user_id: userId,
             });
           if (customerError) console.error("Error saving customer:", customerError);
         }
