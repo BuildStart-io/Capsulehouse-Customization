@@ -122,7 +122,7 @@ serve(async (req) => {
       const { data: publicData } = admin.storage.from(bucket).getPublicUrl(key);
       const publicUrl = publicData.publicUrl.replace(
         SUPABASE_URL,
-        Deno.env.get("SUPABASE_PUBLIC_URL") || SUPABASE_URL
+        "https://supabase.buildstart.io"
       );
       console.log(`Uploaded ${publicUrl} (${body.byteLength} bytes)`);
       
