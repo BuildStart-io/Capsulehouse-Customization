@@ -37,6 +37,18 @@ serve(async (req) => {
     console.log(`[process-message] Recovered ${staleRecovered.length} stale messages`);
   }
 
+  // Step 1.5: Retry failed messages older than 1 minute
+  const { data: failedRecovered } = await supabase
+    .from("message_queue")
+    .update({ status: "pending", updated_at: new Date().toISOString() })
+    .eq("status", "failed")
+    .lt("updated_at", new Date(Date.now() - 60 * 1000).toISOString())
+    .select("id");
+
+  if (failedRecovered && failedRecovered.length > 0) {
+    console.log(`[process-message] Retrying ${failedRecovered.length} failed messages`);
+  }
+
   // Step 2: Process messages in a loop
   let processedCount = 0;
   const maxIterations = 10; // Safety cap per invocation
@@ -58,7 +70,7 @@ serve(async (req) => {
     let query = supabase
       .from("message_queue")
       .select("*")
-      .in("status", ["pending", "failed"])
+      .eq("status", "pending")
       .lt("attempts", 3)
       .order("created_at", { ascending: true })
       .limit(1);
@@ -92,7 +104,7 @@ serve(async (req) => {
       .from("message_queue")
       .update({ status: "processing", attempts: msg.attempts + 1, updated_at: new Date().toISOString() })
       .eq("id", msg.id)
-      .in("status", ["pending", "failed"])
+      .eq("status", "pending")
       .select()
       .single();
     mark("claim_end");
