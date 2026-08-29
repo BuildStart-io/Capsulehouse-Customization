@@ -276,7 +276,10 @@ CRITICAL SYSTEM REQUIREMENTS & SECURITY RULES:
     if (!trimmedMessage) {
       messages.push({ role: "user", content: "[Customer sent a photo/media file. This is likely a payment slip or receipt. Acknowledge it politely and ask them to confirm if it's a payment confirmation. Do NOT output any JSON, tags, or code.]" });
     } else {
-      messages.push({ role: "user", content: trimmedMessage });
+      messages.push({ 
+        role: "user", 
+        content: `${trimmedMessage}\n\n[SYSTEM INSTRUCTION: If you have now collected ALL 4 details (Full Name, Contact Number, Project Location, Expected Start Time) from the user, you MUST include the <CUSTOMER_JSON>...</CUSTOMER_JSON> block at the very end of your response.]` 
+      });
     }
 
     // ------------------------------------------------------------------
