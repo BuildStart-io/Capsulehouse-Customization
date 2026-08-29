@@ -2141,3 +2141,27 @@ GRANT ALL ON TABLE public.user_wsender_sessions TO service_role;
 
 \unrestrict GCoNOs7mBfXioTfTnsPcdgMmKCwWOcfA0SlfN3WrM1XpO6Nhmj9aKeXA6JwDskO
 
+
+CREATE TABLE public.customers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    name text NOT NULL,
+    contact_number text,
+    location text,
+    start_time text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE ONLY public.customers
+    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
+
+CREATE POLICY "Allow all for super_admin" ON public.customers
+    FOR ALL USING (has_role(auth.uid(), 'super_admin'::app_role));
+
+CREATE POLICY "Users can view own customers" ON public.customers
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Staff can view owner customers" ON public.customers
+    FOR SELECT USING (EXISTS (SELECT 1 FROM public.staff_accounts sa WHERE sa.staff_user_id = auth.uid() AND sa.owner_id = customers.user_id AND sa.is_active = true AND 'customers' = ANY(sa.permissions)));
+
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
