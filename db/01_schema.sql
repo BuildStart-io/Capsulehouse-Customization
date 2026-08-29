@@ -2164,4 +2164,10 @@ CREATE POLICY "Users can view own customers" ON public.customers
 CREATE POLICY "Staff can view owner customers" ON public.customers
     FOR SELECT USING (EXISTS (SELECT 1 FROM public.staff_accounts sa WHERE sa.staff_user_id = auth.uid() AND sa.owner_id = customers.user_id AND sa.is_active = true AND 'customers' = ANY(sa.permissions)));
 
+CREATE POLICY "Users can delete own customers" ON public.customers
+    FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Staff can delete owner customers" ON public.customers
+    FOR DELETE USING (EXISTS (SELECT 1 FROM public.staff_accounts sa WHERE sa.staff_user_id = auth.uid() AND sa.owner_id = customers.user_id AND sa.is_active = true AND 'customers' = ANY(sa.permissions)));
+
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
