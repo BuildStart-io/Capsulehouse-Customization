@@ -491,9 +491,9 @@ CRITICAL SYSTEM REQUIREMENTS & SECURITY RULES:
           const { error: updateError } = await supabase
             .from("customers")
             .update({
-              name: customerData.name,
-              location: customerData.location,
-              start_time: customerData.start_time,
+              name: customerData.name || customerData.full_name,
+              location: customerData.location || customerData.project_location || customerData.customer_location,
+              start_time: customerData.start_time || customerData.expected_start_time || customerData.expected_project_start_time,
             })
             .eq("id", existingCustomers[0].id);
           if (updateError) console.error("Error updating customer:", updateError);
@@ -502,10 +502,10 @@ CRITICAL SYSTEM REQUIREMENTS & SECURITY RULES:
           const { error: customerError } = await supabase
             .from("customers")
             .insert({
-              name: customerData.name,
-              contact_number: customerData.contact_number,
-              location: customerData.location,
-              start_time: customerData.start_time,
+              name: customerData.name || customerData.full_name,
+              contact_number: customerData.contact_number || customerData.phone_number || customerData.phone,
+              location: customerData.location || customerData.project_location || customerData.customer_location,
+              start_time: customerData.start_time || customerData.expected_start_time || customerData.expected_project_start_time,
               user_id: userId,
             });
           if (customerError) console.error("Error saving customer:", customerError);
